@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Quotes.Models.Quotations>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Quote List</h2>
+
+<p>
+    @Html.ActionLink("Add a quote", "Create", null, new { @class = "btn btn-info" })
+</p>
+
+@{ 
+    var grid = new WebGrid(Model);
+}<div>@grid.GetHtml(
+     tableStyle: "table",
+     columns: grid.Columns(
+         grid.Column("Category.Name", header: "Category"),
+         grid.Column("Author"),
+         grid.Column("Quote")
+     )
+     )</div>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Category.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Author)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Quote)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DateAdded)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Category.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Author)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Quote)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DateAdded)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>
