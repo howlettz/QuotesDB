@@ -174,8 +174,18 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201510141622256_InitialCreate.cs" />
+    <Compile Include="Migrations\201510141622256_InitialCreate.Designer.cs">
+      <DependentUpon>201510141622256_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201510232251545_UpdateDB.cs" />
+    <Compile Include="Migrations\201510232251545_UpdateDB.Designer.cs">
+      <DependentUpon>201510232251545_UpdateDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\VarHolder.cs" />
     <Compile Include="Models\Quotations.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -192,6 +202,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Properties\PublishProfiles\ZQuotesDB.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -254,6 +265,14 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201510141622256_InitialCreate.resx">
+      <DependentUpon>201510141622256_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201510232251545_UpdateDB.resx">
+      <DependentUpon>201510232251545_UpdateDB.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

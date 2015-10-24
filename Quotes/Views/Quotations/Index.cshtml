@@ -4,61 +4,62 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Quote List</h2>
+<!--Importing JQuery-->
+<head>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryval")
 
+    <!--Hide "Display All" button when not doing a search-->
+    <script>
+        $(document).ready(function () {
+
+            if ('@ViewBag.isSearch' == 'False') {
+                $("disp").hide();
+            } else {
+                $("disp").show();
+            }
+        });
+    </script>
+</head>
+
+
+<h2> Quote List</h2>
+
+<!--Top button cluster-->
 <p>
-    @Html.ActionLink("Add a quote", "Create", null, new { @class = "btn btn-info" })
+    @Html.ActionLink("Add a quote", "Create", null, new { @class = "btn btn-success" })
+
+    @using(Html.BeginForm("Index", "Quotations", FormMethod.Get))
+    {
+        <div class="form-inline">
+            @Html.TextBox("searchTerm", null, htmlAttributes: new { @class = "form-control", id="searchBox"})
+            <input id="searchButton" class="btn btn-default" type="submit" value="Search" />
+            <disp><input class="btn btn-default" type="button" value="Display All" onclick="searchBox.value = ''; document.getElementById('searchButton').click();"/></disp>
+        </div>
+    }
+
 </p>
 
-@{ 
-    var grid = new WebGrid(Model);
-}<div>@grid.GetHtml(
-     tableStyle: "table",
-     columns: grid.Columns(
-         grid.Column("Category.Name", header: "Category"),
-         grid.Column("Author"),
-         grid.Column("Quote")
-     )
-     )</div>
-
-
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Category.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Author)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Quote)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DateAdded)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Category.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Author)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Quote)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.DateAdded)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
+@{
+    var grid = new WebGrid(Model, defaultSort: "DateAdded");
 }
 
-</table>
+<!--Database view-->
+    <div>
+        @grid.GetHtml(
+    tableStyle: "table",
+    columns: grid.Columns(
+        grid.Column("Category.Name", header: "Category"),
+        grid.Column("Author"),
+        grid.Column("Quote", canSort: false, format: (item) => new MvcHtmlString("<div style='width:400px;'>" + item.Quote + "</div>")),
+        grid.Column("DateAdded", header: "Date Added", format: @<text>@item.DateAdded.ToLongDateString()</text>),
+        grid.Column(header: "Modify Entries", format: @<text>@Html.ActionLink("Edit", "Edit", new { id = item.ID }, new { @class = "btn btn-warning" })
+        @Html.ActionLink("Details", "Details", new { id = item.ID }, new { @class = "btn btn-info" })
+        @Html.ActionLink("Delete", "Delete", new { id = item.ID }, new { @class = "btn btn-danger" })</text>)
+    )
+    )
+</div>
+
+
+

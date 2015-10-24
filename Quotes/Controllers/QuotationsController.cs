@@ -7,18 +7,43 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Quotes.Models;
+using System.Web.UI;
 
 namespace Quotes.Controllers
 {
     public class QuotationsController : Controller
     {
         private QuotesContext db = new QuotesContext();
+        private VarHolder storeSearch = new VarHolder();
+
 
         // GET: Quotations
-        public ActionResult Index()
+        public ActionResult Index(string searchTerm)
         {
+
+            storeSearch.isSearch = false;
+
             var quotations = db.Quotations.Include(q => q.Category);
-            return View(quotations.ToList());
+
+            var searchQuotes = db.Quotations.AsQueryable();
+
+            if (searchTerm != null && searchTerm != "")
+            {
+                var quoteSearch = searchQuotes.Where(g => g.Quote.Contains(searchTerm));
+                var authorSearch = searchQuotes.Where(g => g.Author.Contains(searchTerm));
+                var categorySearch = searchQuotes.Where(g => g.Category.Name.Contains(searchTerm));
+
+                searchQuotes = quoteSearch.Union(authorSearch);
+                searchQuotes = searchQuotes.Union(categorySearch);
+
+                searchQuotes = searchQuotes.Distinct();
+
+                storeSearch.isSearch = true;
+            }
+
+            ViewBag.isSearch = storeSearch.isSearch;
+
+            return View(searchQuotes);
         }
 
         // GET: Quotations/Details/5
@@ -47,9 +72,35 @@ namespace Quotes.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Author,Quote,DateAdded,CategoryID")] Quotations quotations)
+        [ValidateAntiForgeryToken]                                 //DateAdded
+        public ActionResult Create([Bind(Include = "ID,Author,Quote,CategoryID")] Quotations quotations, string CategoryName)
         {
+            //Put current time into DateAdded
+            quotations.DateAdded = DateTime.Now;
+
+            //If there is a category name entered
+            if (CategoryName != "")
+            {
+                //Check for a category with that name first to avoid duplicate
+                if (db.Categories.Count(s => s.Name.Equals(CategoryName)) == 0)
+                {
+                    //Since the category does not yet exist, add it!
+                    Category newCat = new Category();
+
+                    newCat.Name = CategoryName;
+                    db.Categories.Add(newCat);
+                    db.SaveChanges();
+                    quotations.CategoryID = (int)newCat.ID;
+                }
+                else
+                {
+                    //Since the category does exist, match the category in the text box with one in the database
+                    var testing = db.Categories.Single(g => g.Name.Equals(CategoryName));
+                    quotations.CategoryID = (int)testing.ID;
+                }
+
+            }
+
             if (ModelState.IsValid)
             {
                 db.Quotations.Add(quotations);
@@ -82,8 +133,33 @@ namespace Quotes.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Author,Quote,DateAdded,CategoryID")] Quotations quotations)
+        public ActionResult Edit([Bind(Include = "ID,Author,Quote,DateAdded,CategoryID")] Quotations quotations, string CategoryName)
         {
+
+            //If there is a category name entered
+            if (CategoryName != "")
+            {
+                //Check for a category with that name first to avoid duplicate
+                if (db.Categories.Count(s => s.Name.Equals(CategoryName)) == 0)
+                {
+                    //Since the category does not yet exist, add it!
+                    Category newCat = new Category();
+
+                    newCat.Name = CategoryName;
+                    db.Categories.Add(newCat);
+                    db.SaveChanges();
+                    quotations.CategoryID = (int)newCat.ID;
+                }
+                else
+                {
+                    //Since the category does exist, match the category in the text box with one in the database
+                    var testing = db.Categories.Single(g => g.Name.Equals(CategoryName));
+                    quotations.CategoryID = (int)testing.ID;
+
+                }
+
+            }
+
             if (ModelState.IsValid)
             {
                 db.Entry(quotations).State = EntityState.Modified;
